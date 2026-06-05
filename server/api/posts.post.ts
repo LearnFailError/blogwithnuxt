@@ -1,11 +1,20 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-  // Perbaikan: gunakan getMethod() dari h3
+  // Cek method
   if (getMethod(event) !== 'POST') {
     throw createError({
       statusCode: 405,
       statusMessage: 'Method not allowed'
+    })
+  }
+
+  // 🔐 CEK AUTH: Pastikan user sudah login
+  const user = await serverSupabaseUser(event)
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized. Silakan login terlebih dahulu.'
     })
   }
 
@@ -22,6 +31,20 @@ export default defineEventHandler(async (event) => {
     
     const client = await serverSupabaseClient(event)
     
+    // Cek slug unik
+    const { data: existing } = await client
+      .from('posts')
+      .select('id')
+      .eq('slug', body.slug)
+      .single()
+    
+    if (existing) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Slug sudah digunakan. Gunakan slug lain.'
+      })
+    }
+    
     const { data, error } = await client
       .from('posts')
       .insert([
@@ -29,7 +52,7 @@ export default defineEventHandler(async (event) => {
           title: body.title,
           slug: body.slug,
           content: body.content,
-          excerpt: body.excerpt || body.content.replace(/<<[^>]*>/g, '').substring(0, 150)
+          excerpt: body.excerpt || body.content.replace(/<[^>]*>/g, '').substring(0, 150)
         }
       ])
       .select()

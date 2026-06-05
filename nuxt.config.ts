@@ -9,12 +9,11 @@ export default defineNuxtConfig({
   
   css: ['~/assets/css/main.css'],
   
-  // Biarkan default kosong — akan di-override oleh NUXT_PUBLIC_* di Netlify
   runtimeConfig: {
-    supabaseServiceKey: '', // di-override oleh NUXT_SUPABASE_SERVICE_KEY
+    supabaseServiceKey: '',
     public: {
-      supabaseUrl: '',      // di-override oleh NUXT_PUBLIC_SUPABASE_URL
-      supabaseKey: ''       // di-override oleh NUXT_PUBLIC_SUPABASE_KEY
+      supabaseUrl: '',
+      supabaseKey: ''
     }
   },
   
@@ -23,13 +22,12 @@ export default defineNuxtConfig({
   },
   
   supabase: {
-    // Module akan auto-baca dari env vars, tapi kita bisa eksplisit juga
-    url: process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-    key: process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY,
+    url: process.env.NUXT_PUBLIC_SUPABASE_URL,
+    key: process.env.NUXT_PUBLIC_SUPABASE_KEY,
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/','/blog/*','/api/*']
+      exclude: ['/', '/blog/*', '/api/*', '/login']
     }
   }
 })
