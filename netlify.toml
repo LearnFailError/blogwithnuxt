@@ -1,9 +1,0 @@
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-# Redirect untuk SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
