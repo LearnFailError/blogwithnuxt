@@ -1,0 +1,46 @@
+import { d as defineEventHandler, f as getRouterParam, e as createError } from '../../../_/nitro.mjs';
+import { s as serverSupabaseClient } from '../../../_/serverSupabaseClient.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import '@supabase/ssr';
+
+const _slug_ = defineEventHandler(async (event) => {
+  try {
+    const slug = getRouterParam(event, "slug");
+    if (!slug) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Slug parameter is required"
+      });
+    }
+    const client = await serverSupabaseClient(event);
+    const { data: post, error } = await client.from("posts").select("*").eq("slug", slug).single();
+    if (error) {
+      if (error.code === "PGRST116") {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Post not found"
+        });
+      }
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Database error: ${error.message}`
+      });
+    }
+    return post;
+  } catch (err) {
+    console.error("API Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      statusMessage: err.statusMessage || "Internal server error"
+    });
+  }
+});
+
+export { _slug_ as default };
+//# sourceMappingURL=_slug_.mjs.map
