@@ -1,8 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-  // Hanya menerima POST request
-  if (event.node.req.method !== 'POST') {
+  // Perbaikan: gunakan getMethod() dari h3
+  if (getMethod(event) !== 'POST') {
     throw createError({
       statusCode: 405,
       statusMessage: 'Method not allowed'
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
           title: body.title,
           slug: body.slug,
           content: body.content,
-          excerpt: body.excerpt || body.content.replace(/<[^>]*>/g, '').substring(0, 150)
+          excerpt: body.excerpt || body.content.replace(/<<[^>]*>/g, '').substring(0, 150)
         }
       ])
       .select()

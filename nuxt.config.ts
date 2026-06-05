@@ -1,7 +1,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  
-  ssr: true,  // ← Penting untuk SSR/SSG hybrid
+  ssr: true,
   
   modules: [
     '@nuxtjs/tailwindcss',
@@ -10,11 +9,12 @@ export default defineNuxtConfig({
   
   css: ['~/assets/css/main.css'],
   
+  // Biarkan default kosong — akan di-override oleh NUXT_PUBLIC_* di Netlify
   runtimeConfig: {
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
+    supabaseServiceKey: '', // di-override oleh NUXT_SUPABASE_SERVICE_KEY
     public: {
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_KEY
+      supabaseUrl: '',      // di-override oleh NUXT_PUBLIC_SUPABASE_URL
+      supabaseKey: ''       // di-override oleh NUXT_PUBLIC_SUPABASE_KEY
     }
   },
   
@@ -23,8 +23,9 @@ export default defineNuxtConfig({
   },
   
   supabase: {
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_KEY,
+    // Module akan auto-baca dari env vars, tapi kita bisa eksplisit juga
+    url: process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+    key: process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY,
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
